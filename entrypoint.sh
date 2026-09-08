@@ -33,10 +33,13 @@ if [ ! -f "$EVEROS_ROOT/everos.toml" ] || [ ! -f "$EVEROS_ROOT/ome.toml" ]; then
 fi
 
 # Caddy runs in the background; a watchdog takes the whole container down if it dies, so Railway
-# restarts us instead of leaving a live container with a dark public port.
+# restarts us instead of leaving a live container with a dark public port. EverOS becomes PID 1
+# below and does not reap children, so a dead Caddy lingers as a zombie: check the process state
+# instead of `kill -0`, which succeeds on zombies.
 $RUN_AS caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null
 $RUN_AS caddy run --config /etc/caddy/Caddyfile --adapter caddyfile &
 CADDY_PID=$!
-( while kill -0 "$CADDY_PID" 2>/dev/null; do sleep 5; done; echo "caddy exited; stopping the container" >&2; kill -TERM 1 ) &
+caddy_alive() { [ -r "/proc/$CADDY_PID/status" ] && ! grep -q '^State:[[:space:]]*Z' "/proc/$CADDY_PID/status"; }
+( while caddy_alive; do sleep 5; done; echo "caddy exited; stopping the container" >&2; kill -TERM 1 ) &
 
 exec $RUN_AS everos server start --root "$EVEROS_ROOT" --port "$EVEROS_API__PORT"
