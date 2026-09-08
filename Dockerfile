@@ -1,6 +1,6 @@
-FROM caddy:2 AS caddy
+FROM caddy:2.11.4 AS caddy
 
-FROM python:3.12-slim
+FROM python:3.12.14-slim
 
 # EverOS from PyPI with the multimodal extra (images, PDF, audio via a vision model).
 # Office documents would also need LibreOffice, which is deliberately not installed.
@@ -13,8 +13,8 @@ COPY --from=caddy /usr/bin/caddy /usr/bin/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
-# EverOS reads EVEROS_<SECTION>__<KEY>. An empty API host makes uvicorn listen on IPv4 and
-# IPv6 (Railway's private network); Caddy fronts the public domain on PORT with a bearer token.
+# EverOS reads EVEROS_<SECTION>__<KEY>. An EMPTY API host makes uvicorn listen on IPv4 and IPv6
+# ('::' would be IPv6-only under asyncio, '0.0.0.0' IPv4-only); Caddy fronts the public domain on PORT.
 ENV EVEROS_ROOT=/data \
     EVEROS_API__HOST= \
     EVEROS_API__PORT=8000 \

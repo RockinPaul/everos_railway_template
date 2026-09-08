@@ -4,8 +4,8 @@
 }
 
 # Public entry point on Railway's PORT. EverOS ships no authentication, so everything except
-# /health requires "Authorization: Bearer <API_TOKEN>". EverOS itself listens on :8000 for the
-# private network, where the official plugins (which send no header) can reach it.
+# /health and CORS preflights requires "Authorization: Bearer <API_TOKEN>". EverOS itself listens
+# on :8000 for the private network, where the official plugins (which send no header) reach it.
 :{$PORT} {
 	log {
 		output stdout
@@ -16,8 +16,17 @@
 		reverse_proxy 127.0.0.1:{$EVEROS_API__PORT}
 	}
 
+	# Browsers send OPTIONS without Authorization; EverOS answers with its own CORS middleware.
+	@preflight method OPTIONS
+	handle @preflight {
+		reverse_proxy 127.0.0.1:{$EVEROS_API__PORT}
+	}
+
 	@authed header Authorization "Bearer {$API_TOKEN}"
 	handle @authed {
+		request_body {
+			max_size 64MB
+		}
 		reverse_proxy 127.0.0.1:{$EVEROS_API__PORT} {
 			flush_interval -1
 		}
