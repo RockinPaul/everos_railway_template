@@ -1,6 +1,6 @@
 # Deploy and Host EverOS on Railway
 
-EverOS is an open-source memory layer for AI agents: it turns conversations into durable, user-owned Markdown memories with a local index, and serves them back to any agent through an HTTP API. It powers the memory plugins for OpenClaw, Hermes, DeepSeek Harness and Dify. This template deploys EverOS 1.3.1 with the multimodal extra as a single Railway service with a persistent volume and a token-protected public API.
+EverOS is an open-source memory layer for AI agents: it turns conversations into durable, user-owned Markdown memories with a local index, and serves them back to any agent through an HTTP API. It powers the memory plugins for OpenClaw, Hermes, DeepSeek Harness and Dify. This template deploys EverOS 1.4.1 with the multimodal extra as a single Railway service with a persistent volume and a token-protected public API.
 
 ## About Hosting EverOS
 
@@ -21,13 +21,13 @@ Hosting EverOS on Railway means one container running two processes: EverOS itse
 ### Deployment Dependencies
 
 - EverOS upstream repository: https://github.com/EverMind-AI/EverOS
-- EverOS API reference: https://github.com/EverMind-AI/EverOS/blob/v1.3.1/docs/api.md
+- EverOS API reference: https://github.com/EverMind-AI/EverOS/blob/v1.4.1/docs/api.md
 - Official plugins: https://github.com/EverMind-AI/plugins
 - Template repository: https://github.com/RockinPaul/everos_railway_template
 
 ### Implementation Details
 
-- `everos`: `python:3.12-slim` with `everos[multimodal]==1.3.1` from PyPI and the Caddy binary from `caddy:2`. Caddy on `PORT` (public domain) enforces `Authorization: Bearer ${API_TOKEN}` for everything except `/health`; EverOS listens on `:8000` for the private network. Volume at `/data`, healthcheck `/health`, unprivileged user.
+- `everos`: `python:3.12-slim` with `everos[multimodal]==1.4.1` from PyPI and the Caddy binary from `caddy:2`. Caddy on `PORT` (public domain) enforces `Authorization: Bearer ${API_TOKEN}` for everything except `/health`; EverOS listens on `:8000` for the private network. Volume at `/data`, healthcheck `/health`, unprivileged user.
 - Variables: `API_TOKEN` (generated), `EVEROS_LLM__API_KEY` (yours), model and base URL defaults for OpenRouter, optional embedding, rerank and multimodal settings, JSON logs.
 - Office documents need LibreOffice, which is not included; images, PDFs and audio work through the multimodal model.
 

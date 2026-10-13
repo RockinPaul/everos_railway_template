@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10 — EverOS 1.4.1
+
+- `EVEROS_VERSION` 1.3.1 → 1.4.1. 1.3.1 declares `openai>=1.0.0` with no ceiling, so every build since 2026-09-24 has installed the openai 3.x line that upstream never tested (3.29.0 on 2026-10-13). That build still extracts and searches, but openai 3.19.2 failed every LLM and embedding call, so the next 3.x release could too. 1.4.1 pins `openai<3`; the image now gets openai 2.54.0.
+- From 1.4.0: vector columns get an IVF_FLAT index once they hold 2000 rows (`EVEROS_LANCEDB__VECTOR_INDEX_MIN_ROWS`), `[cascade] scan_interval_seconds` is a setting, `cascade sync` / `fix --apply` / `rebuild` refuse to run next to a live server (exit 3), pyarrow ≥ 25.0.1, and `POST /memory/add` answers 422 for a `role: "tool"` message without `tool_call_id`.
+
+### Upgrading an existing deployment
+
+Nothing to do beyond the redeploy. The first start after the update builds vector indexes on tables past 2000 rows (about 1.4 s per column at 100k rows) while search keeps working. Upstream's `LanceDBSchemaMismatchError` note only concerns stores older than 1.1.1; this template started at 1.3.1. The entrypoint never calls `everos cascade`, so the new exit code does not affect it.
+
 ## 2026-09 — initial release, EverOS 1.3.1
 
 - One service built from `Dockerfile`: `python:3.12.14-slim`, `everos[multimodal]==1.3.1` from PyPI, Caddy 2.11.4 binary. No LibreOffice (office uploads return 503).
