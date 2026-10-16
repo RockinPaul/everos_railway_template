@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-16 — EverOS 1.4.2
+
+- `EVEROS_VERSION` 1.4.1 → 1.4.2. Same dependency set (openai 2.54.0, lancedb 0.34.0, pyarrow 26.0.0).
+- **Long-running servers stop leaking file descriptors.** 1.4.1 kept a LanceDB index reader for every index version it ever opened, so the open-file count grew for the life of the process; upstream measured a server on a 1024-descriptor limit running out within hours. 1.4.2 caps both caches.
+- **Memories in two projects no longer overwrite each other in the index.** Index rows were keyed on `id`, which is unique only within one `project_id`, so a user's memories written under a second project replaced the first project's in search (the Markdown files were never affected). Reproduced locally on 1.4.1: after `alice` got a memory in project `beta`, her memory in project `alpha` no longer came back from search.
+- Searches no longer wait behind background embedding work: queries get their own budget (`[embedding].query_max_concurrent`, default 4), and the background default rises from 5 to 10, so up to 14 embedding requests can be in flight at once. Lower `EVEROS_EMBEDDING__MAX_CONCURRENT` if your provider rate-limits.
+- The index is optimized at most once a minute (was every ten seconds), so a new memory can take up to a minute longer to show up in keyword search.
+- Hardening: `PATCH /knowledge/documents/{id}` with category `..` could move a document out of `knowledge/`, where it was no longer found. Only a caller holding the API token could do this.
+
+### Upgrading an existing deployment
+
+Nothing to do beyond the redeploy. On its first start 1.4.2 re-checks every indexed Markdown file against the index once and re-embeds only the rows that were lost, so a root where two projects overwrote each other repairs itself. Verified locally: the 1.4.1 volume from the reproduction above, upgraded in place, returned `alpha`'s memory again alongside `beta`'s, and new memories in new projects were stored and found. The pass reads every file once, so the first start takes longer on a large root. If you ran reflection across several projects before this update, upstream recommends running `everos cascade rebuild` once; it refuses to run while the server is up, and the entrypoint never runs it for you. A fresh deploy passes the same add, flush and search check as 1.4.1, and requests without the token still get 401.
+
 ## 2026-10 — EverOS 1.4.1
 
 - `EVEROS_VERSION` 1.3.1 → 1.4.1. 1.3.1 declares `openai>=1.0.0` with no ceiling, so every build since 2026-09-24 has installed the openai 3.x line that upstream never tested (3.29.0 on 2026-10-13). That build still extracts and searches, but openai 3.19.2 failed every LLM and embedding call, so the next 3.x release could too. 1.4.1 pins `openai<3`; the image now gets openai 2.54.0.

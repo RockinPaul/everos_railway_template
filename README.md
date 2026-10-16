@@ -6,7 +6,7 @@ Railway template for [EverOS](https://github.com/EverMind-AI/EverOS), the open-s
 
 | Service | Runs | Source |
 |---|---|---|
-| `everos` | EverOS 1.4.1 from PyPI with the multimodal extra, behind a small Caddy gateway | `Dockerfile` |
+| `everos` | EverOS 1.4.2 from PyPI with the multimodal extra, behind a small Caddy gateway | `Dockerfile` |
 
 ## How access works
 
@@ -32,7 +32,7 @@ Every service in the same project can use the private port without any credentia
    curl -X POST https://<domain>/api/v2/memory/flush -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"session_id":"demo","app_id":"default","project_id":"default"}'
    curl -X POST https://<domain>/api/v2/memory/search -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"query":"Yosemite","user_id":"alice","app_id":"default","project_id":"default","method":"keyword"}'
    ```
-   Search needs exactly one of `user_id` or `agent_id`. The default `method` is `hybrid`, which requires an embedding provider and answers `PROVIDER_NOT_CONFIGURED` until you set one; pass `"method":"keyword"` for the one-key setup. The full API is in upstream's [api.md](https://github.com/EverMind-AI/EverOS/blob/v1.4.1/docs/api.md).
+   Search needs exactly one of `user_id` or `agent_id`. The default `method` is `hybrid`, which requires an embedding provider and answers `PROVIDER_NOT_CONFIGURED` until you set one; pass `"method":"keyword"` for the one-key setup. The full API is in upstream's [api.md](https://github.com/EverMind-AI/EverOS/blob/v1.4.2/docs/api.md).
 4. Optional upgrades: set the embedding variables for vector and hybrid search, the rerank variables for reranking. Without them EverOS uses keyword search and says so in `/health` under `disabled_features`.
 
 ## Variables
@@ -50,11 +50,11 @@ Every service in the same project can use the private port without any credentia
 | `EVEROS_LOG_FORMAT`, `EVEROS_LOG_LEVEL` | `json`, `INFO` | |
 | `PORT` | `8080` | Caddy's public port. EverOS itself is fixed on 8000 (`EVEROS_API__PORT`). |
 
-Everything else in upstream's `everos.toml` can be overridden with `EVEROS_<SECTION>__<KEY>` variables on the service; see upstream's [configuration guide](https://github.com/EverMind-AI/EverOS/blob/v1.4.1/docs/configuration.md).
+Everything else in upstream's `everos.toml` can be overridden with `EVEROS_<SECTION>__<KEY>` variables on the service; see upstream's [configuration guide](https://github.com/EverMind-AI/EverOS/blob/v1.4.2/docs/configuration.md).
 
 ## How it fits together
 
-- The image installs `everos[multimodal]==1.4.1` from PyPI on `python:3.12-slim` and copies the Caddy binary from the official image. Office documents (DOC, PPT, XLS) would also need LibreOffice, which is not installed; those uploads return 503 as upstream documents.
+- The image installs `everos[multimodal]==1.4.2` from PyPI on `python:3.12-slim` and copies the Caddy binary from the official image. Office documents (DOC, PPT, XLS) would also need LibreOffice, which is not installed; those uploads return 503 as upstream documents.
 - On start the container hands the root-owned volume to the `everos` user and drops privileges. If `/data/everos.toml` is missing it runs `everos init` once (the server refuses to start without the file; the shipped defaults are overridden by the environment). Then EverOS starts on `:8000` on both IPv4 and IPv6 (an empty `EVEROS_API__HOST`), and Caddy on `PORT`.
 - Data layout on the volume: Markdown memories under `/data`, the SQLite state database and LanceDB indexes under `/data/.index/`, uploads under `/data/uploads`. Back up the volume to keep the memories; the index is rebuildable.
 - Healthcheck `/health` goes through Caddy to EverOS. Railway only runs it at deploy time, so the entrypoint also watches Caddy: if the gateway dies, the container stops and Railway's restart policy brings both processes back. If EverOS dies, it is PID 1 and the container stops as well.
