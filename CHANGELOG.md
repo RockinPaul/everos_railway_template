@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-02 — EverOS 1.5.1
+
+- `EVEROS_VERSION` 1.4.2 → 1.5.1. `openai` stays bounded below 3 upstream (`openai<3,>=1.0.0`).
+- **Startup refuses an index built by a different embedding model.** If you change `EVEROS_EMBEDDING__MODEL` after memories are indexed, the server stops with a message pointing at `everos cascade rebuild` instead of returning useless search results. Keyword-only deployments (no embedding key) skip the check.
+- Every start makes one embedding call to measure the vector width, with a 5-second budget; a failure only logs a warning. `/health` `capabilities.embed` now reports that probe.
+- `/add` accepts `async_mode: true` to extract in the background; hybrid and vector search allow 16 concurrent query embeddings instead of 4.
+
+### Upgrading an existing deployment
+
+Nothing to do beyond the redeploy. On its first start 1.5.1 records the embedding model in the existing index without touching any rows.
+
 ## 2026-10-16 — EverOS 1.4.2
 
 - `EVEROS_VERSION` 1.4.1 → 1.4.2. Same dependency set (openai 2.54.0, lancedb 0.34.0, pyarrow 26.0.0).

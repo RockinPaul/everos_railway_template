@@ -6,7 +6,7 @@ Railway template for [EverOS](https://github.com/EverMind-AI/EverOS), the open-s
 
 | Service | Runs | Source |
 |---|---|---|
-| `everos` | EverOS 1.4.2 from PyPI with the multimodal extra, behind a small Caddy gateway | `Dockerfile` |
+| `everos` | EverOS 1.5.1 from PyPI with the multimodal extra, behind a small Caddy gateway | `Dockerfile` |
 
 ## How access works
 
@@ -54,7 +54,7 @@ Everything else in upstream's `everos.toml` can be overridden with `EVEROS_<SECT
 
 ## How it fits together
 
-- The image installs `everos[multimodal]==1.4.2` from PyPI on `python:3.12-slim` and copies the Caddy binary from the official image. Office documents (DOC, PPT, XLS) would also need LibreOffice, which is not installed; those uploads return 503 as upstream documents.
+- The image installs `everos[multimodal]==1.5.1` from PyPI on `python:3.12-slim` and copies the Caddy binary from the official image. Office documents (DOC, PPT, XLS) would also need LibreOffice, which is not installed; those uploads return 503 as upstream documents.
 - On start the container hands the root-owned volume to the `everos` user and drops privileges. If `/data/everos.toml` is missing it runs `everos init` once (the server refuses to start without the file; the shipped defaults are overridden by the environment). Then EverOS starts on `:8000` on both IPv4 and IPv6 (an empty `EVEROS_API__HOST`), and Caddy on `PORT`.
 - Data layout on the volume: Markdown memories under `/data`, the SQLite state database and LanceDB indexes under `/data/.index/`, uploads under `/data/uploads`. Back up the volume to keep the memories; the index is rebuildable.
 - Healthcheck `/health` goes through Caddy to EverOS. Railway only runs it at deploy time, so the entrypoint also watches Caddy: if the gateway dies, the container stops and Railway's restart policy brings both processes back. If EverOS dies, it is PID 1 and the container stops as well.
