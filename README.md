@@ -32,7 +32,7 @@ Every service in the same project can use the private port without any credentia
    curl -X POST https://<domain>/api/v2/memory/flush -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"session_id":"demo","app_id":"default","project_id":"default"}'
    curl -X POST https://<domain>/api/v2/memory/search -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"query":"Yosemite","user_id":"alice","app_id":"default","project_id":"default","method":"keyword"}'
    ```
-   Search needs exactly one of `user_id` or `agent_id`. The default `method` is `hybrid`, which requires an embedding provider and answers `PROVIDER_NOT_CONFIGURED` until you set one; pass `"method":"keyword"` for the one-key setup. The full API is in upstream's [api.md](https://github.com/EverMind-AI/EverOS/blob/v1.4.2/docs/api.md).
+   Search needs exactly one of `user_id` or `agent_id`. The default `method` is `hybrid`, which requires an embedding provider and answers `PROVIDER_NOT_CONFIGURED` until you set one; pass `"method":"keyword"` for the one-key setup. The full API is in upstream's [api.md](https://github.com/EverMind-AI/EverOS/blob/v1.5.1/docs/api.md).
 4. Optional upgrades: set the embedding variables for vector and hybrid search, the rerank variables for reranking. Without them EverOS uses keyword search and says so in `/health` under `disabled_features`.
 
 ## Variables
@@ -50,7 +50,7 @@ Every service in the same project can use the private port without any credentia
 | `EVEROS_LOG_FORMAT`, `EVEROS_LOG_LEVEL` | `json`, `INFO` | |
 | `PORT` | `8080` | Caddy's public port. EverOS itself is fixed on 8000 (`EVEROS_API__PORT`). |
 
-Everything else in upstream's `everos.toml` can be overridden with `EVEROS_<SECTION>__<KEY>` variables on the service; see upstream's [configuration guide](https://github.com/EverMind-AI/EverOS/blob/v1.4.2/docs/configuration.md).
+Everything else in upstream's `everos.toml` can be overridden with `EVEROS_<SECTION>__<KEY>` variables on the service; see upstream's [configuration guide](https://github.com/EverMind-AI/EverOS/blob/v1.5.1/docs/configuration.md).
 
 ## How it fits together
 

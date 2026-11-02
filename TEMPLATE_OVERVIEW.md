@@ -1,6 +1,6 @@
 # Deploy and Host EverOS on Railway
 
-EverOS is an open-source memory layer for AI agents: it turns conversations into durable, user-owned Markdown memories with a local index, and serves them back to any agent through an HTTP API. It powers the memory plugins for OpenClaw, Hermes, DeepSeek Harness and Dify. This template deploys EverOS 1.4.2 with the multimodal extra as a single Railway service with a persistent volume and a token-protected public API.
+EverOS is an open-source memory layer for AI agents: it turns conversations into durable, user-owned Markdown memories with a local index, and serves them back to any agent through an HTTP API. It powers the memory plugins for OpenClaw, Hermes, DeepSeek Harness and Dify. This template deploys EverOS 1.5.1 with the multimodal extra as a single Railway service with a persistent volume and a token-protected public API.
 
 ## About Hosting EverOS
 
