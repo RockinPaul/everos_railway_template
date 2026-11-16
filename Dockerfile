@@ -1,10 +1,10 @@
-FROM caddy:2.11.4 AS caddy
+FROM caddy:2.11.9 AS caddy
 
 FROM python:3.12.14-slim
 
 # EverOS from PyPI with the multimodal extra (images, PDF, audio via a vision model).
 # Office documents would also need LibreOffice, which is deliberately not installed.
-ARG EVEROS_VERSION=1.5.1
+ARG EVEROS_VERSION=1.7.0
 RUN pip install --no-cache-dir "everos[multimodal]==${EVEROS_VERSION}" \
  && groupadd --gid 1000 everos \
  && useradd --uid 1000 --gid everos --create-home --home-dir /home/everos everos
